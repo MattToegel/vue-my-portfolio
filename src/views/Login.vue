@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { ref } from "vue";
 import {
   getAuth,
@@ -16,37 +16,67 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { useRouter } from "vue-router"; // import router
-const email = ref("");
-const password = ref("");
-const router = useRouter();
-const login = () => {
-  // we'll let firebase determine the password rules
-  // for just make sure password and confirm are the same
 
-  const auth = getAuth();
-  signInWithEmailAndPassword(auth, email.value, password.value)
-    .then((data) => {
-      console.log("Successfully logged in!", data);
-      router.push("/home");
-    })
-    .catch((error) => {
-      console.log(error.code);
-      alert(error.message);
-    });
-};
+export default {
+  setup() {
+    const email = ref("");
+    const password = ref("");
+    const router = useRouter();
+    return {
+      email,
+      password,
+      router,
+    };
+  },
 
-const forgotPassword = () => {
-  const auth = getAuth();
-  sendPasswordResetEmail(auth, email.value)
-    .then(() => {
-      // Password reset email sent!
-      // ..
-      alert("Password reset email sent!");
-    })
-    .catch((error) => {
-      console.log("Password reset error", error);
-      alert(error.message);
-      // ..
-    });
+  methods: {
+    forgotPassword() {
+      const auth = getAuth();
+      sendPasswordResetEmail(auth, this.email)
+        .then(() => {
+          // Password reset email sent!
+          // ..
+          //alert("Password reset email sent!");
+          this.$flashMessage.show({
+            type: "success",
+            title: "Password Reset Email Sent!",
+            text: "Please check your email and potentially your spam folder",
+          });
+        })
+        .catch((error) => {
+          console.log("Password reset error", error);
+          this.$flashMessage.show({
+            type: "error",
+            title: "Password Reset Error",
+            text: error.message,
+          });
+          // ..
+        });
+    },
+    login() {
+      const auth = getAuth();
+      // we'll let firebase determine the password rules
+      // for just make sure password and confirm are the same
+      signInWithEmailAndPassword(auth, this.email, this.password)
+        .then((data) => {
+          console.log("Successfully logged in!", data);
+          this.$flashMessage.show({
+            type: "success",
+            title: "Login Successful",
+            text: "Welcome!",
+          });
+          this.router.push("/home");
+        })
+        .catch((error) => {
+          console.log(error.code);
+          //alert(error.message);
+          this.$flashMessage.show({
+            type: "error",
+            title: "Login Error",
+            text: error.message,
+          });
+        });
+    },
+  },
 };
 </script>

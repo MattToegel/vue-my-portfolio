@@ -3,9 +3,9 @@ import { createApp, ref } from "vue";
 import App from "./App.vue";
 import { initializeApp } from "firebase/app";
 import router from "./router";
+import store from './store'
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import FlashMessage from "@smartweb/vue-flash-message";
-
-//import { getAuth, onAuthStateChanged } from "@firebase/auth";
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
@@ -20,13 +20,14 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 let app;
-//TODO may not be needed? (Ignore for now, this used to be a method to ensure the app loaded properly)
-//const auth = getAuth();
-//onAuthStateChanged(auth, () => {
+const auth = getAuth();
+//ensures app is created during auth changes (and page refreshes)
+onAuthStateChanged(auth, () => {
 if (!app) {
   app = createApp(App);
+  app.use(store);
   app.use(router);
   app.use(FlashMessage, { strategy: "multiple" }, ref);
   app.mount("#app");
 }
-//});
+});

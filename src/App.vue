@@ -12,12 +12,14 @@
   <FlashMessage />
 </template>
 <script setup>
-import { ref } from "vue";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { computed } from "@vue/reactivity";
-
+import { useStore } from "vuex";
+const store = useStore();
 const auth = getAuth();
-const currentUser = ref(auth.currentUser);
+const currentUser = computed(() => {
+  return store.getters.currentUser;
+});
 const username = computed(() => {
   console.log("current user change", currentUser.value);
   if (currentUser.value) {
@@ -29,13 +31,7 @@ const username = computed(() => {
   return "";
 });
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("user", user);
-    currentUser.value = user;
-  } else {
-    console.log("user is logged out");
-    currentUser.value = null;
-  }
+  store.dispatch("fetchUser", user);
 });
 const logout = () => {
   auth.signOut();

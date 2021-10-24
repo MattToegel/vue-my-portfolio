@@ -19,7 +19,8 @@ export default {
     const password = ref("");
     const confirm = ref("");
     const router = useRouter();
-    return { email, password, confirm, router };
+    const auth = getAuth();
+    return { email, password, confirm, router, auth };
   },
   methods: {
     register() {
@@ -35,8 +36,7 @@ export default {
         return;
       }
 
-      const auth = getAuth();
-      createUserWithEmailAndPassword(auth, this.email, this.password)
+      createUserWithEmailAndPassword(this.auth, this.email, this.password)
         .then((data) => {
           console.log("Successfully registered!", data);
           this.$flashMessage.show({

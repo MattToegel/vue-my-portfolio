@@ -1,10 +1,11 @@
-import { createApp } from "vue";
+import { createApp, ref } from "vue";
 // @ts-ignore
 import App from "./App.vue";
 import { initializeApp } from "firebase/app";
 import router from "./router";
 import store from './store'
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import FlashMessage from "@smartweb/vue-flash-message";
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
@@ -26,6 +27,7 @@ if (!app) {
   app = createApp(App);
   app.use(store);
   app.use(router);
+  app.use(FlashMessage, { strategy: "multiple" }, ref);
   app.mount("#app");
 }
 });

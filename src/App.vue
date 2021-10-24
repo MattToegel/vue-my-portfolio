@@ -9,6 +9,7 @@
   </div>
   <p v-if="username">Welcome, {{ username }}</p>
   <router-view />
+  <FlashMessage />
 </template>
 <script setup>
 import { getAuth, onAuthStateChanged } from "@firebase/auth";

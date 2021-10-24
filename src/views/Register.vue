@@ -8,31 +8,54 @@
   <div><button @click="register">Submit</button></div>
 </template>
 
-<script setup>
+<script>
 import { ref } from "vue";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "vue-router"; // import router
-const email = ref("");
-const password = ref("");
-const confirm = ref("");
-const router = useRouter();
-const register = () => {
-  // we'll let firebase determine the password rules
-  // for just make sure password and confirm are the same
-  if (password.value !== confirm.value) {
-    alert("Password and Confirm password must match");
-    return;
-  }
 
-  const auth = getAuth();
-  createUserWithEmailAndPassword(auth, email.value, password.value)
-    .then((data) => {
-      console.log("Successfully registered!", data);
-      router.push("/login");
-    })
-    .catch((error) => {
-      console.log(error.code);
-      alert(error.message);
-    });
+export default {
+  setup() {
+    const email = ref("");
+    const password = ref("");
+    const confirm = ref("");
+    const router = useRouter();
+    const auth = getAuth();
+    return { email, password, confirm, router, auth };
+  },
+  methods: {
+    register() {
+      // we'll let firebase determine the password rules
+      // for just make sure password and confirm are the same
+      if (this.password !== this.confirm) {
+        //alert("Password and Confirm password must match");
+        this.$flashMessage.show({
+          type: "warning",
+          title: "Validation Error",
+          text: "Passwords must match",
+        });
+        return;
+      }
+
+      createUserWithEmailAndPassword(this.auth, this.email, this.password)
+        .then((data) => {
+          console.log("Successfully registered!", data);
+          this.$flashMessage.show({
+            type: "success",
+            title: "Registration Successful",
+            text: "Successfully Registered!",
+          });
+          this.router.push("/login");
+        })
+        .catch((error) => {
+          console.log(error.code);
+          //alert(error.message);
+          this.$flashMessage.show({
+            type: "error",
+            title: "Reigstration Error",
+            text: error.message,
+          });
+        });
+    },
+  },
 };
 </script>

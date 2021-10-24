@@ -10,6 +10,14 @@ const routes = [
     },
   },
   {
+    path: "/post/:id?",
+    // @ts-ignore
+    component: () =>
+      // @ts-ignore
+      import(/* webpackChunkName: "MyContent" */ "../views/MyContent.vue"),
+    props:true
+  },
+  {
     path: "/register",
     // @ts-ignore
     component: () =>

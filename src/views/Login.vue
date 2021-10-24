@@ -22,17 +22,18 @@ export default {
     const email = ref("");
     const password = ref("");
     const router = useRouter();
+    const auth = getAuth();
     return {
       email,
       password,
       router,
+      auth,
     };
   },
 
   methods: {
     forgotPassword() {
-      const auth = getAuth();
-      sendPasswordResetEmail(auth, this.email)
+      sendPasswordResetEmail(this.auth, this.email)
         .then(() => {
           // Password reset email sent!
           // ..
@@ -54,10 +55,9 @@ export default {
         });
     },
     login() {
-      const auth = getAuth();
       // we'll let firebase determine the password rules
       // for just make sure password and confirm are the same
-      signInWithEmailAndPassword(auth, this.email, this.password)
+      signInWithEmailAndPassword(this.auth, this.email, this.password)
         .then((data) => {
           console.log("Successfully logged in!", data);
           this.$flashMessage.show({

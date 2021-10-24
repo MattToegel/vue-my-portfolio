@@ -33,6 +33,7 @@ export default {
   setup(props) {
     const auth = getAuth();
     const currentUser = ref(auth.currentUser);
+    console.log("setup user", currentUser);
     const isEditing = ref(false);
     const db = getFirestore();
     const post = ref({
@@ -52,7 +53,7 @@ export default {
     isEditing.value = canEdit || post.value.id.length === 0;
     const pageTitle = computed(() => {
       //conditionally display the title
-      if (post.value.id.length === 0) {
+      if (post.value.id.trim().length === 0) {
         return "Create Post";
       }
       if (canEdit && isEditing.value) {
@@ -104,14 +105,36 @@ export default {
       }
       console.log("isValid", isValid);
       if (isValid) {
+        console.log(this.currentUser);
         //create
-        await setDoc(
-          doc(this.db, "posts", this.slug),
-          Object.assign(this.post, { id: this.slug })
-        );
-        /*if (this.post.id.trim().length === 0) {
-          addDoc(collection(db, "posts")), post;
-        }*/
+        const postData = Object.assign(this.post, {
+          id: this.slug,
+          author: this.currentUser.uid,
+        });
+        console.log("Post Data", postData);
+        await setDoc(doc(this.db, "posts", this.slug), postData)
+          .then(() => {
+            if (this.post.id.trim().length === 0) {
+              this.$flashMessage.show({
+                type: "success",
+                title: "Success",
+                text: "Created new Post!",
+              });
+            } else {
+              this.$flashMessage.show({
+                type: "success",
+                title: "Success",
+                text: "Saved Post Changes!",
+              });
+            }
+          })
+          .catch((err) => {
+            this.$flashMessage.show({
+              type: "error",
+              title: "DB Error",
+              text: err.message,
+            });
+          });
       }
     },
   },

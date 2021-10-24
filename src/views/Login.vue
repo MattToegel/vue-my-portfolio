@@ -65,7 +65,7 @@ export default {
             title: "Login Successful",
             text: "Welcome!",
           });
-          this.router.push("/home");
+          this.router.push("/");
         })
         .catch((error) => {
           console.log(error.code);

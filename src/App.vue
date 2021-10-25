@@ -7,29 +7,14 @@
       >Logout</router-link
     >
   </div>
-  <p v-if="username">Welcome, {{ username }}</p>
   <router-view />
   <FlashMessage />
 </template>
 <script setup>
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
-import { computed } from "@vue/reactivity";
 import { useStore } from "vuex";
 const store = useStore();
 const auth = getAuth();
-const currentUser = computed(() => {
-  return store.getters.currentUser;
-});
-const username = computed(() => {
-  console.log("current user change", currentUser.value);
-  if (currentUser.value) {
-    if (currentUser.value.displayName) {
-      return currentUser.value.displayName;
-    }
-    return currentUser.value.email;
-  }
-  return "";
-});
 onAuthStateChanged(auth, (user) => {
   store.dispatch("fetchUser", user);
 });

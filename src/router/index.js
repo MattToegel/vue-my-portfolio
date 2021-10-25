@@ -10,6 +10,14 @@ const routes = [
     },
   },
   {
+    path: "/posts",
+    name: "Posts",
+    component: () => {
+      // @ts-ignore
+      return import(/* webpackChunkName: "posts" */ "../views/Posts.vue");
+    },
+  },
+  {
     path: "/post/:id?",
     // @ts-ignore
     component: () =>

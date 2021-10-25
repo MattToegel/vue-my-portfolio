@@ -32,3 +32,5 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
     - [Live Recording] TDB
     - [Basic Auth Slides](https://docs.google.com/presentation/d/1-DdaPmKIuORsOvXrc87ixBvRm80i7VgOQvf969dD_9A/view)
     - [Flash Messages](https://docs.google.com/presentation/d/1Z27V1ymipT2D636se2cXsKVhlKDzMpgRAXscXi_-vEc/edit#slide=id.p)
+    - [Application State](https://docs.google.com/presentation/d/1RGShY5oqJbQ134cBNOCEKidHWojbHlW4sdzzLhsTtu4/view)
+    - [My First Content](https://docs.google.com/presentation/d/1mKnanhGhwWWKx39BJ1Y9oSJIEWxsY3cFsb7wh9sZfbM/view)

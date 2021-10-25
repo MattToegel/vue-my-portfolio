@@ -1,6 +1,9 @@
 <!-- View/Edit/Create -->
 <template>
   <h1>{{ pageTitle }}</h1>
+  <button v-if="canEdit" @click="isEditing = !isEditing">
+    {{ isEditing ? "View" : "Edit" }}
+  </button>
   <div v-if="isEditing">
     <form @submit.prevent="submit">
       <div>
@@ -15,14 +18,22 @@
       <button type="submit">{{ buttonText }}</button>
     </form>
   </div>
-  <div v-else></div>
+  <div v-else>
+    <article>
+      <header>{{ post.title }}</header>
+      <section>
+        {{ post.content }}
+      </section>
+    </article>
+  </div>
 </template>
 <script>
-import { getAuth } from "firebase/auth";
 import { ref } from "vue";
 import { computed } from "@vue/reactivity";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 export default {
   props: {
     id: {
@@ -31,8 +42,11 @@ export default {
     },
   },
   setup(props) {
-    const auth = getAuth();
-    const currentUser = ref(auth.currentUser);
+    const router = useRouter();
+    const store = useStore();
+    const currentUser = computed(() => {
+      return store.getters.currentUser;
+    });
     console.log("setup user", currentUser);
     const isEditing = ref(false);
     const db = getFirestore();
@@ -44,13 +58,14 @@ export default {
       updated: false,
       author: "",
     });
+
     const slug = computed(() => {
       return post.value.title.trim().toLowerCase().replace(" ", "-");
     });
     const canEdit = computed(() => {
       return post.value.author === currentUser.value.uid;
     });
-    isEditing.value = canEdit || post.value.id.length === 0;
+    isEditing.value = canEdit && post.value.id.length === 0;
     const pageTitle = computed(() => {
       //conditionally display the title
       if (post.value.id.trim().length === 0) {
@@ -74,7 +89,23 @@ export default {
       buttonText,
       slug,
       db,
+      router,
     };
+  },
+  mounted() {
+    if (this.id) {
+      getDoc(doc(this.db, "posts", this.id)).then((doc) => {
+        if (doc.exists()) {
+          this.post = Object.assign(this.post, doc.data());
+        } else {
+          this.$flashMessage.show({
+            type: "warning",
+            title: "Post Lookup",
+            text: "The post you're looking for doesn't exist",
+          });
+        }
+      });
+    }
   },
   methods: {
     async submit() {
@@ -110,6 +141,7 @@ export default {
         const postData = Object.assign(this.post, {
           id: this.slug,
           author: this.currentUser.uid,
+          updated: new Date(),
         });
         console.log("Post Data", postData);
         await setDoc(doc(this.db, "posts", this.slug), postData)
@@ -127,6 +159,7 @@ export default {
                 text: "Saved Post Changes!",
               });
             }
+            this.router.replace(`/post/${this.slug}`);
           })
           .catch((err) => {
             this.$flashMessage.show({

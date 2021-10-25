@@ -1,18 +1,30 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <p v-if="username">Welcome, {{ username }}</p>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
-
+import { computed } from "@vue/reactivity";
+import { useStore } from "vuex";
 export default {
   name: "Home",
-  components: {
-    HelloWorld,
+  setup() {
+    const store = useStore();
+    const currentUser = computed(() => {
+      return store.getters.currentUser;
+    });
+    const username = computed(() => {
+      console.log("current user change", currentUser.value);
+      if (currentUser.value) {
+        if (currentUser.value.displayName) {
+          return currentUser.value.displayName;
+        }
+        return currentUser.value.email;
+      }
+      return "";
+    });
+    return { username };
   },
 };
 </script>

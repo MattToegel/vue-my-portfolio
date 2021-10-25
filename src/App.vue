@@ -16,7 +16,9 @@ import { useStore } from "vuex";
 const store = useStore();
 const auth = getAuth();
 onAuthStateChanged(auth, (user) => {
-  store.dispatch("fetchUser", user);
+  store.dispatch("fetchUser", user).then(() => {
+    currentUser.value; //by calling it, it'll have the computed property recalc
+  });
 });
 const logout = () => {
   auth.signOut();

@@ -63,6 +63,9 @@ export default {
       return post.value.title.trim().toLowerCase().replace(" ", "-");
     });
     const canEdit = computed(() => {
+      if (!currentUser.value) {
+        return false;
+      }
       return post.value.author === currentUser.value.uid;
     });
     isEditing.value = canEdit && post.value.id.length === 0;

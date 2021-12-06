@@ -12,8 +12,12 @@
 </template>
 <script setup>
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import { computed } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
+const currentUser = computed(() => {
+  return store.getters.currentUser || {};
+});
 const auth = getAuth();
 onAuthStateChanged(auth, (user) => {
   store.dispatch("fetchUser", user).then(() => {
